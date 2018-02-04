@@ -1,0 +1,156 @@
+{
+	"plugin_id": "thermolearn",
+	"name_fr": "ThermoLearn",
+	"icon": "thermolearn.png",
+	"version": "1.1",
+	"creation_date": "2017-12-05",
+	"modification_date": "2017-12-08",
+	"author": "Influman",
+	"description_fr": "Thermostat virtuel intelligent pour eedomus.<BR><b>Nécessite un serveur web php déporté avec base de donnée MySQL</b><BR>Téléchargements des données complémentaires <a href='https://github.com/influman/eedomus_ThermoLearn' target='_blank'>ici</a>.",
+	"description_en": "",
+	"description_es": "",
+	"description_it": "",
+	"description_de": "",
+	"forum_link": "http://forum.eedomus.com/viewtopic.php?f=50&t=2425&p=22534",
+	"parameters":
+	[
+		{
+		"parameter": "SERVER",
+		"description": "Accès script thermoLearn (IP/Dossier)",
+		"xtype": "textfield",
+		"default_value": "192.168.0.x/thermoLearn",
+		"field": "width:400, allowBlank:false"
+		},
+		{
+		"parameter": "ZONE",
+		"description": "N° de Zone (1-8)",
+		"xtype": "combo",
+		"default_value": "1",
+		"field": "width:40, allowBlank:false, store:[1,2,3,4,5,6,7,8], editable: false, shadow: true, triggerAction: 'all', typeAhead:true"
+		},
+		{
+		"parameter": "DETECT",
+		"description": "Détecteur de présence associé",
+		"xtype": "combo",
+        "field": "store : getCombo('/json/list_all.php'), displayField: 'label', valueField: 'id', typeAhead: true, forceSelection: true, triggerAction: 'all', selectOnFocus: true, editable: false, shadow:true, mode: 'local', width: 250, listWidth: 300, allowBlank: false"
+       },
+       	{
+		"parameter": "CONSIGNE",
+		"description": "Consigne réelle associée",
+		"xtype": "textfield",
+		"xtype": "combo",
+        "field": "store : getCombo('/json/list_all.php'), displayField: 'label', valueField: 'id', typeAhead: true, forceSelection: true, triggerAction: 'all', selectOnFocus: true, editable: false, shadow:true, mode: 'local', width: 250, listWidth: 300, allowBlank: false"
+        }
+	],
+	"scripts":
+	[
+		{
+			"name": "thermolearn_call.php"
+		}
+	],
+	"devices":
+  [
+{
+			"device_id": "thermomode",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ThermoMode Zone #plugin.parameters.ZONE",
+			"icon": "thermolearn_mode.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.SERVER",
+				"VAR2": "plugin.parameters.ZONE",
+      			"VAR3": "plugin.parameters.DETECT,plugin.parameters.CONSIGNE",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "http://localhost/script/?exec=thermolearn_call.php&action=setmode&type=actualize&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=na",
+				"RAW_XPATH": "/THERMOLEARN/MODE[VAR2]",
+				"POLLING": "5"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "Manuel", "icon": "thermolearn_mode_user.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setmode&type=set&value=[RAW_VALUE]&server=[VAR1]&zone=[VAR2]&param=[VAR3]" },
+				{ "value": "1", "description": "Programmation", "icon": "thermolearn_mode_eprog.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setmode&type=set&value=[RAW_VALUE]&server=[VAR1]&zone=[VAR2]&param=[VAR3]" },
+    			{ "value": "9", "description": "Manue[3h]", "icon": "thermolearn_mode_usersmart.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setmode&type=set&value=[RAW_VALUE]&server=[VAR1]&zone=[VAR2]&param=[VAR3]" },
+    			{ "value": "99", "description": "Intelligent", "icon": "thermolearn_mode_smart.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setmode&type=set&value=[RAW_VALUE]&server=[VAR1]&zone=[VAR2]&param=[VAR3]" }
+       		]	
+	},
+{
+			"device_id": "thermoconsigne",
+			"parent_id": "thermomode",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ThermoConsigne Zone #plugin.parameters.ZONE",
+			"icon": "thermolearn_zone.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.SERVER",
+				"VAR2": "plugin.parameters.ZONE",
+      			"VAR3": "plugin.parameters.DETECT,plugin.parameters.CONSIGNE",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "http://localhost/script/?exec=thermolearn_call.php&action=setpoint&type=actualize&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=na",
+				"RAW_XPATH": "/THERMOLEARN/SETPOINT[VAR2]",
+				"POLLING": "5"
+			},
+			"values":
+			[
+	{ "value": "9", "description": "9 °C", "icon": "thermolearn_9.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },	
+	{ "value": "16", "description": "16 °C", "icon": "thermolearn_16.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },	
+	{ "value": "17", "description": "17 °C", "icon": "thermolearn_17.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "18", "description": "18 °C", "icon": "thermolearn_18.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "19", "description": "19 °C", "icon": "thermolearn_19.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "20", "description": "20 °C", "icon": "thermolearn_20.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "21", "description": "21 °C", "icon": "thermolearn_21.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "22", "description": "22 °C", "icon": "thermolearn_22.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "23", "description": "23 °C", "icon": "thermolearn_23.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "24", "description": "24 °C", "icon": "thermolearn_24.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },
+	{ "value": "25", "description": "25 °C", "icon": "thermolearn_25.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "&action=setpoint&type=set&server=[VAR1]&zone=[VAR2]&param=[VAR3]&value=[RAW_VALUE]" },	
+	{ "value": "0", "description": "0 °C", "hidden":1, "icon": "thermolearn_touch.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "109", "description": "9","hidden":1, "icon": "thermolearn_9_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "116", "description": "16", "hidden":1, "icon": "thermolearn_16_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "116.5", "description": "16.5", "hidden":1, "icon": "thermolearn_165_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "117", "description": "17", "hidden":1, "icon": "thermolearn_17_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "117.5", "description": "17.5", "hidden":1, "icon": "thermolearn_175_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "118", "description": "18", "hidden":1, "icon": "thermolearn_18_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "118.5", "description": "18.5", "hidden":1, "icon": "thermolearn_185_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "119", "description": "19", "hidden":1, "icon": "thermolearn_19_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "119.5", "description": "19.5", "hidden":1, "icon": "thermolearn_195_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "120", "description": "20", "hidden":1, "icon": "thermolearn_20_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "120.5", "description": "20.5", "hidden":1, "icon": "thermolearn_205_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "121", "description": "21", "hidden":1, "icon": "thermolearn_21_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "121.5", "description": "21.5", "hidden":1, "icon": "thermolearn_215_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "122", "description": "22", "hidden":1, "icon": "thermolearn_22_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "122.5", "description": "22.5", "hidden":1, "icon": "thermolearn_225_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "123", "description": "23", "hidden":1, "icon": "thermolearn_23_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "123.5", "description": "23.5", "hidden":1, "icon": "thermolearn_235_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "124", "description": "24", "hidden":1, "icon": "thermolearn_24_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "124.5", "description": "24.5", "hidden":1, "icon": "thermolearn_245_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "125", "description": "25", "hidden":1, "icon": "thermolearn_25_auto.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "201", "description": "19_16", "hidden":1, "icon": "thermolearn_19_16.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "202", "description": "19_20", "hidden":1, "icon": "thermolearn_19_20.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "203", "description": "19_21", "hidden":1, "icon": "thermolearn_19_21.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "204", "description": "19_22", "hidden":1, "icon": "thermolearn_19_22.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "205", "description": "19_23", "hidden":1, "icon": "thermolearn_19_23.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "206", "description": "20_16", "hidden":1, "icon": "thermolearn_20_16.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "207", "description": "20_19", "hidden":1, "icon": "thermolearn_20_19.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "208", "description": "20_21", "hidden":1, "icon": "thermolearn_20_21.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "209", "description": "20_22", "hidden":1, "icon": "thermolearn_20_22.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "210", "description": "21_16", "hidden":1, "icon": "thermolearn_21_16.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "211", "description": "21_19", "hidden":1, "icon": "thermolearn_21_19.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "212", "description": "21_20", "hidden":1, "icon": "thermolearn_21_20.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "213", "description": "21_22", "hidden":1, "icon": "thermolearn_21_22.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "214", "description": "22_16", "hidden":1, "icon": "thermolearn_22_16.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "215", "description": "22_19", "hidden":1, "icon": "thermolearn_22_19.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "216", "description": "22_20", "hidden":1, "icon": "thermolearn_22_20.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" },
+       { "value": "217", "description": "22_21", "hidden":1, "icon": "thermolearn_22_21.png", "http_url": "http://localhost/script/?exec=thermolearn_call.php", "http_type": "GET",  "http_params": "?action=void" }
+       		]	
+	}
+  ]
+}
+
+
+
+
